@@ -13,12 +13,17 @@ import {
   createUIMessageStreamResponse,
   type ToolSet
 } from "ai";
-import { openai } from "@ai-sdk/openai";
+import { createOpenAI } from "@ai-sdk/openai";
 import { processToolCalls, cleanupMessages } from "./utils";
 import { tools, executions } from "./tools";
-// import { env } from "cloudflare:workers";
+import { env } from "cloudflare:workers";
 
-const model = openai("gpt-4o-2024-11-20");
+const openaiWithProxy = createOpenAI({
+  apiKey: env.OPENAI_API_KEY,
+  baseURL: "https://gateway.ai.cloudflare.com/v1/d6850012d250c1600028b55d1d879b16/math-ai-agent/openai",
+});
+
+const model = openaiWithProxy("gpt-4o-2024-11-20");
 // Cloudflare AI Gateway
 // const openai = createOpenAI({
 //   apiKey: env.OPENAI_API_KEY,
@@ -36,9 +41,9 @@ export class Chat extends AIChatAgent<Env> {
     onFinish: StreamTextOnFinishCallback<ToolSet>,
     _options?: { abortSignal?: AbortSignal }
   ) {
-    // const mcpConnection = await this.mcp.connect(
-    //   "https://path-to-mcp-server/sse"
-    // );
+    const mcpConnection = await this.mcp.connect(
+      "https://cf-demo-remote-mcp-server.dev-demos.workers.dev/mcp"
+    );
 
     // Collect all tools, including MCP tools
     const allTools = {
