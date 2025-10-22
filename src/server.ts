@@ -41,14 +41,29 @@ export class Chat extends AIChatAgent<Env> {
     onFinish: StreamTextOnFinishCallback<ToolSet>,
     _options?: { abortSignal?: AbortSignal }
   ) {
-    const mcpConnection = await this.mcp.connect(
-      "https://cf-demo-remote-mcp-server.dev-demos.workers.dev/mcp"
-    );
+    try {
+      console.log('Attempting to connect to MCP server...');
+      await this.mcp.connect(
+        "https://math-mcp2.areyouaidemo.com/mcp"
+      );
+      console.log('MCP connection successful');
+    } catch (error) {
+      console.error('MCP connection failed:', error);
+      console.error('Error details:', {
+        message: error instanceof Error ? error.message : String(error),
+        status: (error as any)?.status,
+        statusText: (error as any)?.statusText
+      });
+    }
 
     // Collect all tools, including MCP tools
+    const mcpTools = this.mcp.getAITools();
+    console.log('Available MCP tools:', Object.keys(mcpTools));
+    console.log('MCP tool details:', mcpTools);
+    
     const allTools = {
       ...tools,
-      ...this.mcp.getAITools()
+      ...mcpTools
     };
 
     const stream = createUIMessageStream({
