@@ -33,6 +33,15 @@ const getLocalTime = tool({
   }
 });
 
+const addTwoNumbers = tool({
+  description: "Get the sum of two numbers",
+  inputSchema: z.object({ num1: z.number(), num2: z.number() }),
+  execute: async ({ num1, num2 }) => {
+    console.log("Using add tool")
+    return num1 + num2;
+  }
+});
+
 const scheduleTask = tool({
   description: "A tool to schedule a task to be executed at a later time",
   inputSchema: scheduleSchema,
@@ -117,7 +126,8 @@ export const tools = {
   getLocalTime,
   scheduleTask,
   getScheduledTasks,
-  cancelScheduledTask
+  cancelScheduledTask,
+  addTwoNumbers
 } satisfies ToolSet;
 
 /**
